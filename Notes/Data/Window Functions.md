@@ -41,3 +41,46 @@ LEAD(expr[, offset[, default]])
 
 LAG(expr[, offset[, default]])
   OVER (Window_specification | Window_name)
+
+
+--------
+User Defined Functions (UDFs)
+
+DELIMITER $$
+
+CREATE FUNCTION function_name(func_parameter1, func_parameter2, ...)
+  RETURN datatype [characteristics]
+/*      func_body      */
+  BEGIN
+    <SQL Statements>
+    RETURN expression;
+END ; $$
+
+DELIMITER ;
+
+CALL function_name;
+
+
+You need to specify the Deterministic keyword to ensure that the output is the same for the same input values. This is disabled in MySQL by default.
+
+---------------
+Stored Procedures
+
+DELIMITER $$
+
+CREATE PROCEDURE Procedure_name (<Paramter List>)
+BEGIN
+  <SQL Statements>
+END $$
+
+DELIMITER ;
+
+CALL Procedure_name;
+------------------
+
+UDF vs 	Stored Procedure
+1. It supports only the input parameter, not the output.	1. It supports input, output and input-output parameters.
+2. It cannot call a stored procedure.	2. It can call a UDF.
+3. It can be called using any SELECT statement.	3. It can be called using only a CALL statement.
+4. It must return a value.	4. It need not return a value.
+5. Only the 'select' operation is allowed.	5. All database operations are allowed.
