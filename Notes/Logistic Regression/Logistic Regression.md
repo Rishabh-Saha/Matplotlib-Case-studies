@@ -94,13 +94,12 @@ The most commonly used metrics to evaluate a classification model:
 
 So, a good model is where TPR is high and FPR is low.
 
-The following is the ROC curve where X- Axis: FPR, Y-Axis: TPR. 
+The following is the ROC curve where X- Axis: FPR, Y-Axis: TPR.
 
 - A good model will have points closer to Y-axis as it approaches 1
 - A bad model will have points away from Y-axis as it approaches 1
 
 ![1723002857624](image/LogisticRegression/1723002857624.png)
-
 
 The Area Under the Curve (AUC) for the Receiver Operating Characteristic (ROC) curve is a performance measurement for classification problems, the higher the AUC, the more accurate the model
 
@@ -115,3 +114,67 @@ The Area Under the Curve (AUC) for the Receiver Operating Characteristic (ROC) c
 
 * Jitna Yes hai, usme se tune kitno ko 'Yes' bola
 * Same as sensitivity
+
+# Logistic Regression cont.
+
+## There are two **types of logistic regression** :
+
+1. **Binary logit:** involves two levels of the dependent variable. For example, the telecom churn example you learnt in earlier sessions is a binary logistic regression problem, as it classifies customers into two levels, churns and non-churns.
+2. **Multinomial logit**: however, involves more than 2 levels of dependent variables, such as whether a customer will purchase product A, product B or not purchase anything.
+
+## Things to consider when selecting **samples:**
+
+1. **Cyclical** or **seasonal fluctuations** in the business that need to be taken care of while building the samples. E.g. Diwali sales, economic ups and downs, etc.
+2. The sample should be **representative of the population** on which the model will be applied in the future.
+3. For **rare events samples** , the sample should be balanced before it is used for modelling.
+
+## Segmentation
+
+Say the accuracy of your model is very low. Sometimes, segmenting the data and creating child models for them and then combining them can help build better models. This helps in increasing the predictive power of a model.
+
+We must ensure that driving factors for each of the child models are different or have different frequency.
+
+Let's talk about the ICICI example:
+
+For students and salaried people, different variables may be important. While students' defaulting and not defaulting will depend on factors such as program enrolled for, the prestige of the university attended, parents' income, etc., the probability of salaried people will depend on factors such as marital status, income, etc. So, the predictive pattern across these two segments is very different, and hence, it would make more sense to make different child models for both of them, than to make one parent model.
+
+## Transforming variables
+
+### Dummy Variable Transformation
+
+There are some pros and cons of transforming variables to dummies. Creating dummies for **categorical variables** is very straightforward. You can directly create n-1 new variables from an existing categorical variable if it has n levels. But for  **continuous variables** , you would be required to do some kind of EDA analysis for binning the variables.
+
+The **major advantage** offered by **dummies** especially for continuous variables is that they make the  **model stable** . In other words, small variations in the variables would not have a very big impact on a model that was made using dummies, but they would still have a sizeable impact on a model built using continuous variables as is.
+
+On the other side, there are some **major** **disadvantages** that exist. E.g. if you change the continuous variable to dummies, all the data will be **compressed** into very few categories and that might result in  **data clumping** .
+
+### Weight of Evidence
+
+**WOE** can be calculated using the following equation:
+
+WOE = ln(good in the bucket/Total Good)−ln(bad in bucket/Total Bad)
+
+Or, it can be expressed as:
+
+WOE = ln(Percentage of Good/ Percentage of Bad)
+
+Once you've calculated woe values, it is also important to note that they should follow an **increasing or decreasing trend** across bins. If the trend is not  **monotonic** , then you would need to compress the buckets/ bins (coarse buckets) of that variable and then calculate the WOE values again.
+
+**Pros**: The model becomes more stable because small changes in the continuous variables will not impact the input so much.
+
+**Cons**: You may end up doing some score clumping.
+
+#### Information Value (IV)
+
+This is a important indicator of predictive power
+
+IV =WOE * (Percentage of good in the bucket − Percentage of bad in the bucket)
+
+## Model Evaluation
+
+Another way of evaluating the model is calculating the GINI of the model:
+
+Gini = 2 * Area Under ROC Curve - 1
+
+* It is the area between ROC curve and X-Axis
+* Higher the GINI, the steeper the ROC, the better the model
