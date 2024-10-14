@@ -26,7 +26,7 @@ Notes:
 * A statistical method that allows us to summarize and study relationships between two continuous (quantitative) variables
 * One variable, denoted x (input), is regarded as the predictor, explanatory, or independent variable.
 * The other variable, denoted y (output), is regarded as the response, outcome, or dependent variable.
-* Here we trying to setup a relationship between X (weight of vehicle, Advertising expense and hour of study per week ) and Y ( Fuel efficiency , Corporate performance and Student performance )
+* Here we trying to setup a relationship between **x** (weight of vehicle, Advertising expense and hour of study per week ) and **y** ( Fuel efficiency , Corporate performance and Student performance )
 
 ## Two types of regression
 
@@ -96,7 +96,6 @@ RSE = sqrt(RSS/df) ;
 
 (degree of freedom) df = n-2 where n = number of data points
 
-
 ## Multiple Linear Regression
 
 It represents the relationship between two or more independent input variables and a response variable. Multiple linear regression is needed when one variable might not be sufficient to create a good model and make accurate predictions.
@@ -112,8 +111,6 @@ Apart from the formulation, there are some other aspects that still remain the s
 3. For inference, the assumptions from simple linear regression still hold - zero-mean, independent and normally distributed error terms with constant variance
 
 ---
-
-
 
 The new aspects to consider when moving from simple to multiple linear regression are:
 
@@ -138,8 +135,6 @@ Multicollinearity affects:
   * p-values are, therefore, not reliable
 
 ---
-
-
 
 Two basic ways of dealing with multicollinearity
 
@@ -186,7 +181,6 @@ There are two major methods to scale the variables,
    * MinMax Scaling:**x = x−min(x)/max(x)−min(x)**
    * Prefer using this, because it takes care of outliers
 
-
 ### Model assessment and comparison
 
 Penalize models for using higher number of predictors
@@ -197,7 +191,6 @@ Hence, there are two new parameters that come into picture:
 * **AIC = ( N * log(RSS/n) ) + 2p**
 
 Here, **n** is the sample size meaning the number of rows you'd have in the dataset and **p** is the number of predictor variables.
-
 
 ### Feature Selection
 
