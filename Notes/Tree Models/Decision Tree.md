@@ -30,7 +30,7 @@ We split the data in a way that results in a homogenous subset is much more desi
 
 In a completely homogenous set, all the data points belong to one particular label. Hence, you must try to generate partitions that result in such sets.
 
-For classification purposes, a data set is completely homogeneous if it contains only a single class label. 
+For classification purposes, a data set is completely homogeneous if it contains only a single class label.
 
 For regression purposes, a data set is completely homogeneous if its variance is as small as possible
 
@@ -52,14 +52,13 @@ For below, i = no of classes
   ![1728886514923](image/DecisionTree/1728886514923.png)
 * Entropy
 
-    ![1728886532168](image/DecisionTree/1728886532168.png)
+  ![1728886532168](image/DecisionTree/1728886532168.png)
 
 | **Impurity Measures**    | **Case I**Class 0: 20Class 1: 80 | **Case II**Class 0: 50Class 1: 50 | **Case III**Class 0: 80Class 1: 20 |
 | ------------------------------ | -------------------------------------- | --------------------------------------- | ---------------------------------------- |
 | **Classification Error** | 0.2                                    | 0.5                                     | 0.2                                      |
 | **Gini Impurity**        | 0.32                                   | 0.5                                     | 0.32                                     |
 | **Entropy**              | 0.72                                   | 1                                       | 0.72                                     |
-
 
 The **change in impurity** or the **purity gain** is given by the difference of impurity post-split from impurity pre-split, i.e.,
 
@@ -170,7 +169,15 @@ Though there are various ways to truncate or prune trees, the DecisionTreeClassi
 4. min_samples_split
 5. min_samples_leaf
 
-### Choosing Tree Hyperparameters 
+#### More on Pruning
+
+In pruning, you chop off the tree branches; this results in a  **decrease in tree complexity** . It also helps in  **reducing overfitting** .
+
+**How do you decide if a branch should be pruned or not?**
+
+You take a tree, look at every node, try pruning it, check if accurracy dropped on validation set, and if the accuracy doesn't drop from the original accuracy then pruning worked. Keep doing it till you can without affecting the accuracy of the model significantly
+
+### Choosing Tree Hyperparameters
 
 Check out the section **Hyperparameter tuning using Grid Search CV to do K-fold validation** in the Heart Prediction Jupyter notebook
 
@@ -191,7 +198,6 @@ This is nothing but the variance of all data points.
 A higher value of MSE means that the data values are dispersed widely around mean, and a lower value of MSE means that the data values are dispersed closely around mean and this is usually the preferred case while building a regression tree.
 
 ### Regression Tree building process
-
 
 The regression tree building process can be summarised as follows:
 
