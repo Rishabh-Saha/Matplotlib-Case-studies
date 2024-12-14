@@ -1,6 +1,6 @@
 # Artificial Nueral Networks
 
-Artificial neural networks (ANN) are a collection of many simple devices called artificial neurons . The network ‘learns’ to conduct certain tasks, such as recognising a cat, by training the neurons  to ‘fire’ in a certain way when given a particular input, such as a cat. In other words, the network learns to inhibit or amplify the input signals to perform a certain task, such as recognising a cat, speaking a word or identifying a tree.
+* Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
 
 ### Perceptron
 
@@ -272,21 +272,22 @@ The number of **epochs** mentioned in the code snippet defines the number of tim
 The main purpose of using dropouts is to reduce overfitting in Neural networks.
 The dropout operation is performed by multiplying the weight matrix Wl with an α mask vector. The shape of the vector **α** will be (Weight columns shape,1). Now if the value of **q** (the probability of 1) is 0.66, the **α** vector will have two 1s and one 0.
 
-
 You can see the differences between the ANN without dropout and the ANN with dropout below. Adding a dropout layer essentially removes the links from the third neuron in the first layer to all the neurons in the next layer. The cross on the interconnections indicates that the interconnection has been removed.
-
 
 ![](https://images.upgrad.com/d9f0dd4d-6330-478d-9a80-67a5ac3b75d3-Dropout1.jpg)
 
 Some important points to note regarding dropouts are:
+
 1. Dropouts can be applied only to some layers of the network (in fact, that is a common practice - you choose some layer arbitrarily to apply dropouts to)
 2. The mask α is generated independently for each layer during feedforward, and the same mask is used in backpropagation
 3. The mask changes with each minibatch/iteration and is randomly generated in each iteration (sampled from a Bernoulli with some p(1)=q)
 
-> # dropping out 20% neurons in a layer in Keras 
+> # dropping out 20% neurons in a layer in Keras
+>
 > model.add(Dropout(0.2))
 
 Some important points to note while implementing dropouts are as follows:
+
 1. Here, '0.2' is the probability of zeros and not ones.
 2. This is one of the hyperparameters to be experimented with when building a neural network.
 3. You do not apply dropout to the output layer.
@@ -300,3 +301,268 @@ Dropouts also help in symmetry breaking. There is an extremely high likelihood t
 Batch normalisation is performed on the output of the layers of each batch, Hl. It is essentially normalising the matrix Hl across all data points in the batch. Each vector in Hl is normalised by the mean vector μ and the standard deviation vector ^σ computed across a batch.
 
 > keras.layers.BatchNormalization()
+
+# **Convolutional Neural Networks**
+
+Convolutional Neural Networks, or CNNs, are neural networks specialised to work with **visual data** , i.e. images and videos (though not restricted to them). They are very similar to the vanilla neural networks (multilayer perceptrons) - every neuron in one layer is connected to every neuron in the next layer, they follow the same general principles of forward and backpropagation, etc. However, there are certain features of CNNs that make them perform extremely well on image processing tasks.
+
+## Some applications of CNN:
+
+- **Object localization**: Identifying the local region of the objects (as a rectangular area) and classifying them.
+- **Semantic segmentation**: Identifying the exact shapes of the objects (pixel by pixel) and classifying them.
+- **Optical Character Recognition (OCR)**: Recognise characters in an image. For example, in the top-left image, the output will be ‘1680’.
+
+![OCR](https://cdn.upgrad.com/UpGrad/temp/2c35aa76-26ee-474b-a6f9-9fa5769bd5b4/ocr.PNG)
+
+Understandings from Influential Paper on [Visual system of a cat](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1363130/pdf/jphysiol01298-0128.pdfhttps:/):
+
+- Each neuron in the retina focuses on one part of the image and that part of the image is called the **receptive field of that neuron**
+- There are **excitatory and inhibitory regions** in the receptive field. The neurons only ‘fire’ when there is a **contrast between the excitatory and the inhibitory regions**. If we splash light over the excitatory and inhibitory regions together, because of no contrast between them, the neurons don’t ‘fire’ (respond). If we splash light just over the excitatory region, neurons respond because of the contrast.
+- The strength of the response is proportional to the summation over only the excitatory region (not inhibitory region). (pooling layer in CNNs)
+- The receptive fields of all neurons are almost identical in shape and size
+- There is a hierarchy in the units: Units at the initial level do very basic tasks such as picking raw features (such as horizontal edges) in the image. The subsequent units extract more abstract features, such as identifying textures, detecting movement, etc. The layers 'higher' in the hierarchy typically aggregate the features in the lower ones.
+
+### VGGNet Architecture
+
+![VGGNet](https://cdn.upgrad.com/UpGrad/temp/780cfac7-3d6e-4f73-91a9-647926eceb66/vgg.PNG)
+
+The most important point to notice is that the network acts as a feature extractor for images
+
+There are three main concepts in CNNs:
+
+1. Convolution, and why it 'shrinks' the size of the input image
+2. Pooling layers
+3. Feature maps
+
+The VGGNet was specially designed for the ImageNet challenge which is a classification task with 1000 categories. Thus, the softmax layer at the end has 1000 categories.
+
+- The blue layers are the convolutional layers
+- The yellow ones are pooling layers
+- The green layer is a fully connected layer with 4096 neurons, the output from which is a vector of size 4096.
+
+![Reading Digital image](./CNN%20notebooks/Reading_Digital_Image.ipynb)
+
+#### Video analysis
+
+For a video classification task, here's what we can do. Suppose the videos are of length 1 minute each. If we extract frames from each video at the rate of 2 frames per second (FPS), we will have 120 frames (or images) per video. Push each of these images into a convolutional net (such as VGGNet) and extract a feature vector (of size 4096, say) for each image. Thus, we have 120 feature vectors representing each video.
+
+These 120 feature vectors, representing a video as a sequence of images, can now be fed sequentially into an RNN (good at processing sequential information such as videos (a sequence of images)) which classifies the videos into one of the categories.
+
+The main point here is that a **CNN acts as a feature extractor for images**, and thus, can be used in a variety of ways to process images.
+
+#### Convolution
+
+Mathematically, the convolution operation is the summation of the element-wise product of two matrices.
+
+![alt text](image-5.png)
+
+Finally, you compute the sum of all the elements in Z to get a scalar number, i.e. 3+4+0+6+0+0+0+45+2 = 60.
+
+![Vertical Edge Detection](https://cdn.upgrad.com/UpGrad/temp/da61bd2a-b996-4628-a22c-ade65216d3cf/Screen+Shot+2018-09-11+at+11.26.59+AM.png)
+
+This is an example of how the convolution operation (using an appropriate filter) detects certain features in images, such as horizontal or vertical edges. You basically move the filter accross the image and generate a convoluted image using element-wise product of 2 matrices.
+
+You can do vertical edge detection like above, or horizontal detection where the filter would look something like [[1,1,1],[0,0,0],[-1,-1,-1]] or diagonal detection etc. It depends on the image and the requirements
+
+---
+
+**Stride** - You move the filter on the image by **x** pixel. This **x** is called as strides. There is nothing sacrosanct about the stride length 1. If you think that you do not need many fine-grained features for your task, you can use a higher stride length (2 or more).
+
+You cannot convolve all images with just any combination of filter and stride length. For example, you cannot convolve a (4, 4) image with a (3, 3) filter using a stride of 2. Similarly, you cannot convolve a (5, 5) image with a (2, 2) filter and a stride of 2 (try and convince yourself).
+
+To solve this problem, you use the concept of **padding**, or an alternate (less commonly used) way to do convolution is to shrink the filter size as you hit the edges.
+
+The following are the two most common ways to do padding:
+
+- Populating the dummy row/columns with the pixel values at the edges
+- Populating the dummy row/columns with zeros (zero-padding)
+
+Padding of 'x' means that 'x units' of rows/columns are added all around the image.
+
+![Padding](https://cdn.upgrad.com/UpGrad/temp/aaef0102-cd6d-424b-b5a7-4332561aa35e/stride.PNG)
+
+**IMPORTANT: Doing convolutions without padding reduces the output size (relative to the input which is being convolved), And if all the layers keep shrinking the output size, by the time the information flows towards the end of the network, the output would have reduced to a very small size (say 2 x 2) - which will be insufficient to store information for complex tasks.**
+
+Size of a convoluted image matrix is given by:
+
+> ((n+2P-k)/S) + 1, ((n+2P-k)/S) + 1
+>
+> (n+2P-k)/S has to be an integer; n+2P-k should be divisible by S
+
+where:
+n = image nxn
+P = padding
+k = filter kxk
+S = stride
+
+---
+
+For 3d images:
+
+- We use 3D filters to perform convolution on 3D images. For example: if we have an image of size (224, 224, 3), we can use filters of sizes (3, 3, 3), (5, 5, 3), (7, 7, 3) etc. (with appropriate padding etc.). We can use a filter of any size as long as the number of channels in the filter is the same as that in the input image.
+- The filters are learnt during training (i.e. during backpropagation). Hence, the individual values of the filters are often called the weights of a CNN.
+- You can express the convolution operation as a dot product between the weights (filter) and the input image
+- Apart from weights each filter can also have a bias and, all the individual elements in the bias vector have the same value (called tied biases)
+
+![alt text](image-6.png)
+
+Given an image of size 128 x 128 x 3, a stride length of 1, padding of 1, and a kernel of size 3x3x3, the output size will be 128 x  128. Though the input and filter are now 3D, the output of convolution will still be a 2D array. This is because, in each step of the convolution, the 9 elements of the filter will be 'dot product-ed' with the 9 elements of the 3D image, giving a single scalar number as the output.
+
+What is the total number of trainable parameters in a kernel/filter of size 3x3x3? Assume that there is a single tied bias associated with the filter.
+
+- 28. There are 27 weights and one bias in the (3, 3, 3) filter
+
+#### Feature Map
+
+- A neuron is basically a filter whose weights are learnt during training. For example, a (3, 3, 3) filter (or neuron) has 27 weights. Each neuron looks at a particular region in the input (i.e. its 'receptive field').
+- A feature map is a collection of multiple neurons each of which looks at different regions of the input with the same weights. All neurons in a feature map extract the same feature (but from different regions of the input). It is called a 'feature map' because it is a mapping of where a certain feature is found in the image.
+
+##### Comprehension - Feature Maps
+
+Consider the VGGNet architecture shown below. The first convolutional layer takes the input image of size (224, 224, 3), uses a (3, 3, 3) filter (with some padding), and produces an output of (224, 224). This (224, 224) output is then fed to a ReLU to generate a (224, 224) feature map. Note that the term 'feature map' refers to the (non-linear) output of the activation function, not what goes into the activation function (i.e. the output of the convolution).
+
+Similarly, multiple other (224, 224) feature maps are generated using different (3, 3, 3) filters. In the case of VGGNet, 64 feature maps of size (224, 224) are generated, which are denoted in the figure below as the tensor 224 x 224 x 64. Each of the 64 feature maps try to identify certain features (such as edges, textures etc.) in the (224, 224, 3) input image.
+
+![Feature Maps](https://cdn.upgrad.com/UpGrad/temp/e571c963-fe12-4263-a058-c79ae2c4c043/vgg.png)
+
+The (224, 224, 64) tensor is the output of the first convolutional layer.  In other words, the first convolutional layer consists of 64 (3, 3, 3) filters, and hence contains 64 x 27 trainable weights (assuming there are no biases).
+
+The 64 feature maps, or the (224, 224, 64) tensor, is then fed to a pooling layer.
+
+#### Pooling
+
+Pooling tries to figure out whether a particular region in the image has the feature we are interested in or not. It essentially looks at larger regions (having multiple patches) of the image and captures an aggregate statistic (max, average etc.) of each region. In other words, it makes the network invariant to local transformations.
+
+The two most popular aggregate functions used in pooling are 'max' and 'average'. The intuition behind these are as follows:
+
+- Max pooling: If any one of the patches says something strongly about the presence of a certain feature, then the pooling layer counts that feature as 'detected'.
+- Average pooling: If one patch says something very firmly but the other ones disagree,  the pooling layer takes the average to find out.
+
+![Pooling](https://cdn.upgrad.com/UpGrad/temp/7a172eac-5c90-46b6-9bb6-058b5225e1fb/Pooling_in_3D.PNG)
+
+Pooling has the advantage of making the representation more compact by reducing the spatial size (height and width) of the feature maps, thereby reducing the number of parameters to be learnt. On the other hand, it also loses a lot of information, which is often considered a potential disadvantage. Having said that, pooling has empirically proven to improve the performance of most deep CNNs.
+
+To summarise, a typical CNN layer (or unit) involves the following two components in sequence:
+
+- We have an input image which is convolved using multiple filters to create multiple feature maps
+- Each feature map, of size (c, c), is pooled to generate a (c/2, c/2) output (for a standard 2 x 2 pooling).
+
+The above pattern is called a CNN layer or unit. Multiple such CNN layers are stacked on top of one another to create deep CNN networks.
+
+### Experiments on cifar10
+
+1. Experiment - I (Use dropouts after conv and FC layers, no Batch Normalization):
+   Training accuracy =  84%, validation accuracy  =  79%
+2. Experiment - II (Remove dropouts from conv layers, retain dropouts in FC, use Batch Normalization):
+   Training accuracy =  98%, validation accuracy  =  79%
+3. Experiment - III (Use dropouts after conv and FC layers, use Batch Normalization):
+   Training accuracy =  89%, validation accuracy  =  82%
+4. Experiment - IV (Remove dropouts from conv layers, use L2 + dropouts in FC, use Batch Normalization):
+   Training accuracy = 94%, validation accuracy = 76%.
+5. Experiment-V: Dropouts after conv layer, L2 in FC, use BN after convolutional layer
+   Train accuracy =  86%, validation accuracy = 83%
+6. Experiment-VI: Add a new convolutional layer to the network
+   Train accuracy =  89%, validation accuracy = 84%
+7. Experiment-VII: Add more feature maps to the convolutional layers to the network
+   Train accuracy =  92%, validation accuracy = 84%
+
+## CNN Architectures
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*DBXf6dzNB78QPHGDofHA4Q.png)
+
+The **depth** of the state-of-the-art neural networks has been **steadily increasing** (from AlexNet with 8 layers to ResNet with 152 layers).
+
+### AlexNet and VGGNet
+
+Alex net Paper: https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf
+
+VGGNet Paper: http://arxiv.org/pdf/1409.1556
+
+The AlexNet was one of the very first architectures to achieve extraordinary results in the ImageNet competition (with about a 17% error rate). It had used 8 layers (5 convolutional and 3 fully connected). One distinct feature of AlexNet was that it had used various kernels of large sizes such as (11, 11), (5, 5), etc. Also, AlexNet was the first to use dropouts, which were quite recent back then.
+
+![AlexNet](https://cdn.upgrad.com/UpGrad/temp/9e90fdf4-2a60-4382-804b-b045a6ffa3b2/Screen+Shot+2018-09-15+at+11.09.50+AM.png)
+
+The key idea in moving from AlexNet to VGGNet was to **increase the depth** of the network by using **smaller filters**
+
+We say that the stack of two (3, 3) filters has the same **effective receptive field** as that of one (5, 5) filter.  This is because both these convolutions produce the same output (of size 1 x 1 here) whose receptive field is the same 5 x 5 image.
+
+![5x5 convolution](https://cdn.upgrad.com/UpGrad/temp/006d64d7-9b7b-4c3f-aa5c-644bd0c52881/5x5conv.PNG)
+
+### GoogleNet
+
+Paper: https://arxiv.org/pdf/1409.4842
+
+Unlike the previous innovations, which had tried to increase the model capacity by adding more layers, reducing the filter size etc. (such as from AlexNet to VGGNet), GoogleNet had increased the depth using a new type of convolution technique using the **Inception module**.
+
+Some important features of the GoogleNet architecture are as follows:
+
+* Inception modules stacked on top of each other, total 22 layers
+* Use of 1 x 1 convolutions in the modules
+* Parallel convolutions by multiple filters (1x1, 3x3, 5x5)
+* Pooling operation of size (3x3)
+* No FC layer, except for the last softmax layer for classification
+* Number of parameters reduced from 60 million (AlexNet) to 4 million
+
+### Residual Net
+
+Research Paper: https://arxiv.org/pdf/1512.03385
+
+The key motivator for the ResNet architecture was the observation that, empirically, adding more layers was not improving the results monotonically.  This was counterintuitive because a network with n + 1 layers should be able to learn *at least* what a network with n layers could learn, plus something more.
+
+The ResNet team [(Kaiming He et al) came up with a novel architecture ](https://arxiv.org/pdf/1512.03385.pdf)with skip connections  which enabled them to train networks as deep as 152 layers . The ResNet achieved groundbreaking results across several competitions - a 3.57% error rate on the ImageNet and the first position in many other ILSVRC and [COCO object detection](http://cocodataset.org/#home) competitions.
+
+The **skip connection mechanism** was the key feature of the ResNet which enabled the training of very deep networks. Some other key features of the ResNet are summarised below:
+
+* ILSVRC’15 classification winner (3.57% top 5 error)
+* 152 layer model for ImageNet
+* Has other variants also (with 35, 50, 101 layers)
+* Every 'residual block' has two 3x3 convolution layers
+* No FC layer, except one last 1000 FC softmax layer for classification
+* Global average pooling layer after the last convolution
+* Batch Normalization after every convolution layer
+* SGD + momentum (0.9)
+* No dropout used
+
+### Transfer learning
+
+Transfer learning is the practice of reusing the skills learnt from solving one problem to learn to solve a new, related problem.
+
+Some practical reasons to use transfer learning are as follows:
+
+- Data abundance in one task and data crunch in another related task,
+- Enough data available for training, but lack of computational resources.
+
+An example of the first case is this - say you want to build a model (to be used in a driverless car to be driven in India) to classify 'objects' such as a pedestrian, a tree, a traffic signal, etc. Now, let's say you don't have enough labelled training data from Indian roads, but you can find a similar dataset from an American city. You can try training the model on the American dataset, take those learned weights, and then train further on the smaller Indian dataset.
+
+Examples of the second use case are more common - say you want to train a model to classify 1000 classes, but don't have the infrastructure required. You can simply pick up a trained VGG or ResNet and train it a little more on your limited infrastructure
+
+Here's an example of document summarisation. If you want to do document summarisation in some other language, such as Hindi, you can take the following steps:
+
+- Use word embeddings in English to train a document summarisation model (assuming a significant amount of data in English is available)
+- Use word embeddings of another language such as Hindi (where you have a data crunch) to tune the English summarisation model
+
+---
+
+The initial layers of a network extract the basic features, the latter layers extract more abstract features, while the last few layers are simply discriminating between images.
+
+In other words, the initial few layers are able to **extract generic representations** of an image and thus can be used for any general image-based task. So you take initial layers of VGGNet/AlexNet/GoogleNet/ResNet which can extract generic representations of an image remove their discrimination layer and add your own discrimination layers based on your use case.
+
+Thus, you have the following two ways of training a pre-trained network:
+
+1. ‘**Freeze**’ the initial layers, i.e. use the same weights and biases that the network has learnt from some other task, remove the few last layers of the pre-trained model, add your own new layer(s) at the end and **train only the newly added layer(s).**
+2. **Retrain** all the weights **starting (initialising) from the weights and biases** that the net has already learnt. Since you don't want to unlearn a large fraction of what the pre-trained layers have learnt. So, for the initial layers, we will choose a low learning rate.
+
+### Comparison on popular architectures
+
+Research paper: https://arxiv.org/pdf/1605.07678
+
+This paper compares the popular architectures on multiple metrics related to resource utilisation such as accuracy, memory footprint, number of parameters, operations count, inference time and power consumption
+
+![Comparison Chart](https://cdn.upgrad.com/UpGrad/temp/2bd9dedd-f58f-4eb0-a5f4-2eb2f5808244/Screen+Shot+2018-09-15+at+3.55.30+PM.png)
+
+* Architectures in a particular cluster, such as** ****GoogleNet, ResNet-18 and ENet,**** **are very attractive since they have** ****small footprints** **** (both memory and time) as well as pretty good accuracies. Because of low-memory footprints, they can be used on** ****mobile devices,** **** and because the number of operations is small, they can also be used in** ****real time inference** .
+* In some ResNet variants (ResNet-34,50,101,152) and Inception models (Inception-v3,v4), there is a** ****trade-off** between model accuracy and efficiency, i.e. the inference time and memory requirement.
+* There is a** ****marginal decrease**** **in the (forward) inference time per image with the batch size. Thus, it might not be a bad idea to use a large batch size if you need to.![Forward Time Per Image vs Batch Size](https://cdn.upgrad.com/UpGrad/temp/e6086d96-09ee-4ba7-a18d-eb3ea2c5c5ac/Screen+Shot+2018-09-15+at+3.56.35+PM.png)
+* Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
+
+![Memory Utilisation vs Batch Size](https://cdn.upgrad.com/UpGrad/temp/53f1aca1-30c5-4bcd-b327-91dad10dba01/Screen+Shot+2018-09-15+at+3.58.30+PM.png)
