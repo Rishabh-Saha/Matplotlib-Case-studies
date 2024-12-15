@@ -302,7 +302,7 @@ Batch normalisation is performed on the output of the layers of each batch, Hl. 
 
 > keras.layers.BatchNormalization()
 
-# **Convolutional Neural Networks**
+# Convolutional Neural Networks
 
 Convolutional Neural Networks, or CNNs, are neural networks specialised to work with **visual data** , i.e. images and videos (though not restricted to them). They are very similar to the vanilla neural networks (multilayer perceptrons) - every neuron in one layer is connected to every neuron in the next layer, they follow the same general principles of forward and backpropagation, etc. However, there are certain features of CNNs that make them perform extremely well on image processing tasks.
 
@@ -566,3 +566,195 @@ This paper compares the popular architectures on multiple metrics related to res
 * Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
 
 ![Memory Utilisation vs Batch Size](https://cdn.upgrad.com/UpGrad/temp/53f1aca1-30c5-4bcd-b327-91dad10dba01/Screen+Shot+2018-09-15+at+3.58.30+PM.png)
+
+# Recurrent Neural Networks
+
+RNNs are specially designed to work with sequential data, i.e. data where there is a natural notion of a 'sequence' such as text (sequences of words, sentences etc.), videos (sequences of images), speech etc. RNNs have been able to produce state-of-the-art results in fields such as natural language processing, computer vision, and time series analysis.
+
+Recurrent neural networks are variants of the vanilla neural networks which are tailored to learn sequential patterns
+
+Few use cases:
+
+- Natural Language processing
+  - RNNs have given, and continue to give, state-of-the-art results in areas such as machine translation, sentiment analysis, question answering systems, speech recognition, text summarization, text generation, conversational agents, handwriting analysis and numerous other areas.
+- In computer vision, RNNs are being used in tandem with CNNs in applications such as image and video processing.
+- auto-reply feature which you see in many chat applications
+- Auto subtitles in youtube
+  - automatic speech recognition (ASR)
+- chatbots
+- generating music using RNNs
+  - Jukebox
+- Although sorting is a problem that involves an algorithm, but the fact that RNNs can learn an algorithm speaks volume about their capacity to solve hard learning problems
+
+---
+
+We’ll use a slightly different notation for the activation - rather than using **h** for the outputs (or activations) of a layer, we will use **a**. Thus, the feedforward equations become:
+
+> z^l = W^l.a^(l−1) + b^l
+> a^l = f^l.(z^l)
+>
+> a^l is not a raised l to but rather a with superscript l or l over a
+
+The main difference between normal neural nets and RNNs is that RNNs have two 'dimensions' - time **t** (i.e. along the sequence length) and the depth **l** (the usual layers). The basic notation itself changes from **a<sup>l</sup>** to **a<sup>l</sup><sub>t</sub>**. In fact, in RNNs it is somewhat incomplete to say '*the output at layer* **l**'; we rather say '*the output at layer  **l** and time **t**' .*
+
+One way to think about RNNs is that the network changes its **state** with time (as it sees new words in a sentence, new frames in a video etc.). For e.g. we say that the state of **a<sup>l</sup><sub>t</sub>** changes to **a<sup>l</sup><sub>t+1</sub>** as it sees the next element in the sequence (word, image etc.)
+
+Thus, the output of layer **l** at time **t+1**, **a<sup>l</sup><sub>t+1</sub>**, depends on two things:
+
+1. The output of the previous layer at the same time step **a<sup>l-1</sup><sub>t+1</sub>** (this is the ***depth*** dimension).
+2. Its own previous state **a<sup>l</sup>** to **a<sup>l</sup><sub>t</sub>** (this is the ***time*** dimension)
+
+In other words, **a<sup>l</sup><sub>t+1</sub>** is a function of **a<sup>l-1</sup><sub>t+1</sub>** and **a<sup>l</sup><sub>t</sub>**:
+
+> a<sup>l</sup><sub>t+1</sub> =g(a<sup>l-1</sup><sub>t+1</sub>,a<sup>l</sup><sub>t</sub>)
+
+> a<sup>l</sup><sub>t+1</sub> = σ(W<sub>F</sub>.a<sup>l-1</sup><sub>t+1</sub> + W<sub>R</sub>.a<sup>l</sup><sub>t</sub> + b<sup>l</sup>)
+
+The W<sub>F</sub> are called the **feedforward weights**.
+The W<sub>R</sub> are called the **recurrent weights**.
+
+We say that there is a recurrent relationship between **a<sup>l</sup><sub>t+1</sub>** and it's previous state **a<sup>l</sup><sub>t</sub>** and hence the name **Recurrent Neural Networks**.
+
+## Architecture of RNN
+
+![Architecture of an RNN](https://cdn.upgrad.com/UpGrad/temp/d4601893-a0f1-4d54-a6e7-fbeedde3589d/many-to-many.JPG)
+
+The **green layer** is the **input layer** in which the x<sub>i</sub>'s are elements in a sequence - words of a sentence, frames of a video, etc.
+
+The layers in **red** are the **'recurrent layers'** - they represent the various states evolving over time as new inputs are seen by the network.
+
+The **blue layer** is the output layer where the y<sub>i</sub>'s are the outputs emitted by the network at each time step.
+
+You can see that the layers of an RNN are similar to the vanilla neural nets (MLPs) - each layer has some neurons and is interconnected to the previous and the next layers. The only difference is that now each layer has a copy of itself along the time dimension (the various states of a layer, shown in red colour).  Thus, the layers along the time dimension have the same number of neurons (since they represent the various states of same l<sub>th</sub> layer over time).
+
+<mark style="background-color: lightblue">
+The flow of information in RNNs is as follows:
+
+Each layer gets the input from two directions -  activations from the previous layer at the current timestep and activations from the current layer at the previous timestep.
+
+Similarly, the activations (outputs from each layer) go in two directions - towards the next layer at the current timestep (through **W<sub>F</sub>**), and towards the next timestep in the same layer (through **W<sub>R</sub>**).
+</mark>
+
+### Matrix dimension
+
+![Matrix Dimensions](https://cdn.upgrad.com/UpGrad/temp/8b00888c-341e-48e2-91e3-af4536f8f007/size_table.png)
+
+### Types of RNNs
+
+- Many-to-One RNN
+
+In this architecture, the input is a sequence while the output is a single element. You check at the end of a sentence whether it is grammatically correct/incorrect.
+
+![Many-to-one architecture](https://cdn.upgrad.com/UpGrad/temp/2549dbe6-e77b-4106-b359-1385c2254f47/many-to-one.JPG)
+
+- Many-to-many RNN: Equal input and output length
+
+In this type of RNN, the input (X) and output (Y) both are a sequence of multiple entities spread over timesteps. This architecture is used to build a **part-of-speech tagger** where each word in the input sequence is tagged with its part-of-speech at every timestep.
+
+- Many-to-many RNN: Unequal input and output lengths
+
+There are many problems where the lengths of the input and output sequences are different. For example, consider the task of machine translation - the length of a Hindi sentence can be different from the corresponding English sentence.
+
+- Encoder-Decoder Architecture
+
+The below architecture comprises of two components - an encoder and a decoder both of which are RNNs themselves. The output of the encoder, called the **encoded vector** (and sometimes also the '**context vector** '), captures a representation of the input sequence. The encoded vector is then fed to the decoder RNN which produces the output sequence.
+
+![Encoder-decoder architecture](https://cdn.upgrad.com/UpGrad/temp/e0389e59-7af5-42cd-98f9-75492d5396a7/encoder_decoder.jpg)
+
+---
+
+In a many-to-one architecture (such as classifying a sentence as correct/incorrect), the loss is simply the difference between the predicted and the actual label. The loss is computed and backpropagated after the entire sequence has been digested by the network.
+
+> Loss = cross - entropy(y<sub>out</sub>, y)
+
+assuming cross-entropy is the loss function
+
+On the other hand, in a many-to-many architecture, the network emits an output at multiple time steps, and the loss is calculated at each time step. The total loss (= the sum of the losses at each time step) is propagated back into the network after the entire sequence has been ingested.
+
+> Loss = ∑<sup>T2</sup><sub>i=1</sub>cross-entropy(y'<sub>i</sub>, y<sub>i</sub>)
+
+We can now add the losses for all the sequences (i.e. for a batch of input sequences) and backpropagate the total loss into the network.
+
+---
+
+- One-to-many RNN
+
+In this type of RNN, the input is a single entity, and output consists of a sequence.
+This type of architecture is generally used as a **generative model**. Among popular use of this architecture are applications such as generating music (given a genre, for example), generating landscape images given a keyword, generating text given an instruction/topic, etc.
+
+![One-to-many architecture](https://cdn.upgrad.com/UpGrad/temp/6cb8822c-e737-46d0-8e3e-77e1ebb7afcc/one-to-many.JPG)
+
+### Variants of RNNs
+
+### Bidirectional RNNs
+
+There are two types of sequences:
+
+- Online sequence: Here, you don’t have access to the entire sequence before you start processing it. The network has to make predictions as it sees each input coming in.
+- Offline sequence: The entire sequence is available before you start processing it.
+
+A bidirectional RNN can only be applied to *offline sequences*.
+
+In offline sequence, you have access to the whole sequence, so you can send a combination of first and last word in a sequence and next would be second and second last word in next sequence. Hence the network will always have visibility of future texts in the sequence. The number of inputs doubles. This is bidirectional RNN.
+
+By using bidirectional RNNs, it is almost certain that you’ll get better results. However, bidirectional RNNs take almost double the time to train since the number of parameters of the network increase. Therefore, you have a tradeoff between training time and performance. The decision to use a bidirectional RNN depends on the computing resources that you have and the performance you are aiming for.
+
+### Problems with RNNs
+
+In the case of RNNs, the main problem is the **vanishing gradients problem** because the chain of gradient dependencies becomes too huge as the network is too huge. The gradients vanish before reaching the initial layers during back propagation, hence no learnings happen on the initial layers.
+
+### LSTMs
+
+To solve the vanishing gradients problem, many attempts have been made to tweak the vanilla RNNs such that the gradients don’t die when sequences get long. The most popular and successful of these attempts has been the **long, short-term memory network**, or the **LSTM**. LSTMs have proven to be so effective that they have almost replaced vanilla RNNs.
+
+The main drastic improvement that LSTMs have brought is because of a novel change in the structure of a neuron itself. In the case of LSTMs, the neurons are called **cells**, and an LSTM cell is different from a normal neuron in many ways.
+
+One of the fundamental differences between an RNN and an LSTM is that an LSTM has an **explicit memory unit** which stores information relevant for learning some task. In the standard RNN, the only way the network remembers past information is through updating the hidden states over time, but it does not have an explicit memory to store information.
+
+On the other hand, in LSTMs, the memory units retain pieces of information even when the sequences get really long
+
+Research paper: https://arxiv.org/pdf/1303.5778.pdf
+
+#### Characteristics of a LSTM
+
+- 'Cell state' or an explicit memory
+- Gating mechanishm
+  - Gating mechanisms regulate the information that the network stores (and passes on to the next layer) or forgets.
+- Constant error carousel
+  - It allows an LSTM network to have a smooth and uninterrupted flow of gradients while backpropagating
+
+#### Structure of a LSTM cell
+
+An LSTM cell is analogous to a neuron in an RNN - each LSTM layer contains multiple LSTM cells.
+
+The cell receives the following inputs:
+
+- The output of the previous time step h<sub>t-1</sub> (a vector)
+- The current input  x<sub>t</sub> (a vector)
+- The previous cell state c<sub>t-1</sub> (usually a vector)
+
+The cell produces two outputs:
+
+- The current cell state c<sub>t</sub> (a scalar)
+- The current state output h<sub>t</sub> (a scalar)
+
+![Cell](https://cdn.upgrad.com/UpGrad/temp/c88b5b4e-40e6-4f2c-97f7-8c0f41f410b9/Screen+Shot+2018-09-30+at+11.36.23+PM.png)
+
+Output of a sigmoid lies in between 0 and 1 while the output of tanh lies between -1 and 1
+
+The three gating mechanisms - the forget gate, the update gate and the output gate.
+
+- **Forget gate**: This gate controls how much information needs to be discarded from the previous cell state (c<sub>t-1</sub>) depending on the new input
+- **Update gate**: This gate makes an update to the previous the cell state by writing a new piece of information to it
+  The new cell state c<sub>t</sub> is the cumulative result of the information discarded from c<sub>t-1</sub> by the forget gate and the new information freshly updated to c<sub>t-1</sub> by the update gate.
+- **Output gate**: This gate controls how much information needs to be passed on to the next LSTM layer based on the current cell state.
+
+The sigmoid function decides how much information to write to the new cell state (forget gate), while the tanh decides whether to increase or decrease the value of the next cell state.(update gate)
+
+An LSTM layer has **4x parameters** as compared to a normal RNN layer. The increased number of parameters leads to increased computational costs. For the same reason, an LSTM is more likely to overfit the training data than a normal RNN.
+
+### GRU
+
+Keeping in mind the computational expenses and the problem of overfitting, researchers have tried to come up with alternate structures of the LSTM cell. The most popular one of these alternatives is the **gated recurrent unit (GRU)** which was introduced in late 2014
+
+It is a leaner version of a LSTMs
