@@ -1,6 +1,4 @@
-# Artificial Nueral Networks
-
-* Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
+# Artificial Neural Networks
 
 ### Perceptron
 
@@ -267,6 +265,9 @@ The number of **epochs** mentioned in the code snippet defines the number of tim
 
 **Batch size** refers to the number of training examples utilised in one iteration. The model decides the number of examples to work with in each iteration before updating the internal model parameters.
 
+Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
+
+
 #### Dropouts
 
 The main purpose of using dropouts is to reduce overfitting in Neural networks.
@@ -299,6 +300,9 @@ Dropouts also help in symmetry breaking. There is an extremely high likelihood t
 #### Batch Normalisation
 
 Batch normalisation is performed on the output of the layers of each batch, Hl. It is essentially normalising the matrix Hl across all data points in the batch. Each vector in Hl is normalised by the mean vector μ and the standard deviation vector ^σ computed across a batch.
+
+Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
+
 
 > keras.layers.BatchNormalization()
 
