@@ -71,6 +71,7 @@ This scaling and adding the vectors up to obtain a new vector is also known as a
 
 Here think of v1 as 165 and B1 as 1lbs, v2 as 74.84 and B2 as kgs
 1. v1* B1 = v2 * B2
+
 Here, think of M as how much lbs is a multiple of kgs
 2. v2 = M * v1
 
