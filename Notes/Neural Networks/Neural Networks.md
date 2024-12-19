@@ -74,9 +74,51 @@ While choosing activation functions, you need to ensure that they are:
 **The features of these activation functions are as follows:**
 
 1. **Sigmoid** : When this type of function is applied, the output from the activation function is bound between 0 and 1 and is not centred around zero. A sigmoid activation function is usually used when we want to regularise the magnitude of the outputs we get from a neural network and ensure that this magnitude does not blow up.
+
+- *Output Range*: (0,1)
+- *Use Cases*:
+  - Used in binary classification tasks (often in the output layer).
+  - Suitable for probability-based outputs.
+- *Advantages*:
+  - Maps any input to a probability-like value.
+- *Disadvantages*:
+  - Vanishing gradient problem: Gradients become very small for large or small inputs.
+  - Outputs not centered at 0, which slows optimization.
+
 2. **Tanh (Hyperbolic Tangent)** : When this type of function is applied, the output is centred around 0 and bound between -1 and 1, unlike a sigmoid function in which case, it is centred around 0.5 and will give only positive outputs. Hence, the output is centred around zero for tanh.
+
+- *Output Range*: (−1,1)
+- *Use Cases*:
+  - Captures both negative and positive activations better than sigmoid.
+  - Tanh outputs values between -1 and 1, with zero being at the center.
+  - This helps in faster convergence during optimization since the gradients are less skewed compared to Sigmoid
+- *Advantages*:
+  - Outputs are zero-centered, making optimization easier.
+- *Disadvantages*:
+  - Suffers from the vanishing gradient problem, though less severe than sigmoid.
+
 3. **ReLU (Rectified Linear Unit)** : The output of this activation function is linear in nature when the input is positive and the output is zero when the input is negative. This activation function allows the network to converge very quickly, and hence, its usage is computationally efficient. However, its use in neural networks does not help the network to learn when the values are negative.
+
+- *Output Range*: [0,∞)
+- *Use Cases*:
+  - Most widely used in hidden layers of deep neural networks.
+  - Effective for convolutional and fully connected layers.
+*Advantages*:
+  - Computationally efficient (simple operation).
+  - Reduces vanishing gradient problems.
+- *Disadvantages*:
+  - Can suffer from the dying ReLU problem, where neurons output 0 for all inputs, effectively becoming inactive.
+
 4. **Leaky ReLU (Leaky Rectified Linear Unit)** : This activation function is similar to ReLU. However, it enables the neural network to learn even when the values are negative. When the input to the function is negative, it dampens the magnitude, i.e., the input is multiplied with an epsilon factor that is usually a number less than one. On the other hand, when the input is positive, the function is linear and gives the input value as the output. We can control the parameter to allow how much ‘learning emphasis’ should be given to the negative value.
+
+- *Output Range*: (−∞,∞)
+- *Use Cases*:
+  - Overcomes the dying ReLU problem, especially in deep networks.
+  - Use in hidden layers when ReLU leads to inactive neurons.
+- *Advantages*:
+  - Allows small gradients for negative inputs (α controls the slope).
+- *Disadvantages*:
+  - Choosing the right value of α can be non-trivial.
 
 ### Parameters and Hyperparameters of a Neural Network
 
@@ -267,7 +309,6 @@ The number of **epochs** mentioned in the code snippet defines the number of tim
 
 Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
 
-
 #### Dropouts
 
 The main purpose of using dropouts is to reduce overfitting in Neural networks.
@@ -302,7 +343,6 @@ Dropouts also help in symmetry breaking. There is an extremely high likelihood t
 Batch normalisation is performed on the output of the layers of each batch, Hl. It is essentially normalising the matrix Hl across all data points in the batch. Each vector in Hl is normalised by the mean vector μ and the standard deviation vector ^σ computed across a batch.
 
 Up to a certain batch size, most architectures use a constant memory, after which the consumption increases linearly with the batch size.
-
 
 > keras.layers.BatchNormalization()
 
