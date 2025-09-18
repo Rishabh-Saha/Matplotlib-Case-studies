@@ -359,7 +359,7 @@ The main distinction between semantic search and generative search is that seman
 
 RAG is a special type of generative search that combines the strengths of semantic search and LLM to generate more accurate responses to user queries. RAG retrieves relevant information from an external knowledge base to supplement the LLM's internal representation of information, which allows for fine-tuning and adjustments to the LLM's internal knowledge, making it more accurate and up-to-date.
 
-RAG can reduce hallucinations and repetition while improving specificity and factual grounding compared with conversation without retrieval. RAG can also provide more contextually appropriate answers to prompts as well as base those answers on the latest data. 
+RAG can reduce hallucinations and repetition while improving specificity and factual grounding compared with conversation without retrieval. RAG can also provide more contextually appropriate answers to prompts as well as base those answers on the latest data.
 
 
 #### RAG pipeline
@@ -393,4 +393,157 @@ The generation layer is typically the last layer of a RAG model which consists o
 
 3. **Pass the prompt with the query and the relevant documents to the LLM**: The final step is to pass the prompt, which is a concatenation of the query and the retrieved documents, to the LLM. The LLM generates a response based on the context of the query, the system prompt and the relevant documents passed from the search layer. The retrieved documents serve as the knowledge bank and provide the necessary context for the query to the LLM, which helps it generate a more accurate and relevant response.
 
+## LangChain
+
+LangChain is a framework designed to simplify the development of applications using large language models (LLMs). It provides a set of tools and abstractions for building LLM-powered applications, making it easier to integrate LLMs into various workflows. Key features of LangChain include:
+
+1. **Modular Components**: LangChain offers a modular architecture, allowing developers to mix and match components based on their specific use cases. This includes support for different LLMs, document loaders, and output parsers.
+
+2. **Document Loaders**: LangChain provides built-in document loaders for various data sources, such as PDFs, web pages, and databases. This makes it easy to ingest and preprocess data for LLMs.
+
+3. **Prompt Management**: LangChain includes tools for managing prompts, including prompt templates and chaining multiple prompts together. This helps developers create more complex interactions with LLMs.
+
+4. **Memory Management**: LangChain offers memory management capabilities, allowing applications to maintain context across multiple interactions with users. This is essential for building conversational agents and other interactive applications.
+
+5. **Integration with External Tools**: LangChain can be easily integrated with external tools and APIs, enabling developers to create more powerful applications that leverage the capabilities of LLMs alongside other services.
+
+Overall, LangChain aims to streamline the process of building LLM-powered applications, making it more accessible for developers and enabling the creation of innovative solutions across various domains.
+
+
+### LangChain memory type
+
+LangChain versions `0.0.x` consisted of various conversational memory types. Most of these are due for deprecation but still hold value in understanding the different approaches that we can take to building conversational memory.
+
+Throughout the notebook we will be referring to these _older_ memory types and then rewriting them using the recommended `RunnableWithMessageHistory` class. We will learn about:
+
+* `ConversationBufferMemory`: the simplest and most intuitive form of conversational memory, keeping track of a conversation without any additional bells and whistles.
+* `ConversationBufferWindowMemory`: similar to `ConversationBufferMemory`, but only keeps track of the last `k` messages.
+* `ConversationSummaryMemory`: rather than keeping track of the entire conversation, this memory type keeps track of a summary of the conversation.
+* `ConversationSummaryBufferMemory`: merges the `ConversationSummaryMemory` and `ConversationTokenBufferMemory` types.
+
+We'll work through each of these memory types in turn, and rewrite each one using the `RunnableWithMessageHistory` class.
+
+
+### LangGraph 101
+
+[LLMs](https://python.langchain.com/docs/concepts/chat_models/) make it possible to embed intelligence into a new class of applications. [LangGraph](https://langchain-ai.github.io/langgraph/) is a framework to help build applications with LLMs. Here, we will overview the basics of LangGraph, explain its benefits, show how to use it to build workflows / agents, and show how it works with [LangChain](https://www.langchain.com/) / [LangSmith](https://docs.smith.langchain.com/).
+
+
+![LangGraph](image-22.png)
+
+[Chat models](https://python.langchain.com/docs/concepts/chat_models/) are the foundation of LLM applications. They are typically accessed through a chat interface that takes a list of [messages](https://python.langchain.com/docs/concepts/messages/) as input and returns a [message](https://python.langchain.com/docs/concepts/messages/) as output. LangChain provides [a standardized interface for chat models](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html), making it easy to [access many different providers](https://python.langchain.com/docs/integrations/chat/).
+
+
+```python
+from langchain.chat_models import init_chat_model
+
+llm = init_chat_model("openai:gpt-4.1", temperature=0)
+result = llm.invoke("What is an agent?")
+```
+
+[Tools](https://python.langchain.com/docs/concepts/tools/) are utilities that can be called by a chat model. In LangChain, creating tools can be done using the `@tool` decorator, which transforms Python functions into callable tools. It will automatically infer the tool's name, description, and expected arguments from the function definition. You can also use [Model Context Protocol (MCP) servers](https://github.com/langchain-ai/langchain-mcp-adapters) as LangChain-compatible tools. 
+
+```python
+from langchain.tools import tool
+
+@tool
+def write_email(to: str, subject: str, content: str) -> str:
+    """Write and send an email."""
+    # Placeholder response - in real app would send email
+    return f"Email sent to {to} with subject '{subject}' and content: {content}"
+```
+
+Tools can be called by LLMs. When a tool is bound to the model, the model can choose to call the tool by returning a structured output with tool arguments. We use the bind_tools method to augment an LLM with tools.
+
+![Tool calling](image-23.png)
+
+```python
+# Connect tools to a chat model
+model_with_tools = llm.bind_tools([write_email], tool_choice="any", parallel_tool_calls=False)
+
+# The model will now be able to call tools
+output = model_with_tools.invoke("Draft a response to my boss (boss@company.ai) about tomorrow's meeting")
+
+# Extract tool calls and execute them
+args = output.tool_calls[0]['args']
+
+# Call the tool
+result = write_email(**args)
+
+```
+
+#### Workflows
+There are many patterns for building applications with LLMs. [We can embed LLM calls into pre-defined workflows](https://langchain-ai.github.io/langgraph/tutorials/workflows/), giving the system more agency to make decisions. As an example, we could add a router step to determine whether to write an email or not.
+
+![workflow](image-24.png)
+
+#### Agents
+
+We can further increase agency, allowing the LLM to dynamically direct its own tool usage. This means the LLM can decide when and how to use tools based on the context of the conversation, rather than following a fixed workflow. This flexibility can lead to more efficient and effective interactions. [Agents](https://langchain-ai.github.io/langgraph/tutorials/workflows/#agent) are typically implemented as tool calling in a loop, where the output of each tool call is used to inform the next action.
+
+![agents](image-25.png)
+
+Agents are well suited to open-ended problems where it's difficult to predict the exact steps needed in advance.
+
+Workflows are often appropriate when the control flow can easily be defined in advance.
+
+![workflow vs agents](image-26.png)
+
+#### What is LangGraph?
+
+[LangGraph](https://langchain-ai.github.io/langgraph/concepts/high_level/) provides low-level supporting infrastructure that sits underneath *any* workflow or agent. It does not abstract prompts or architecture, and provides a few benefits:
+- **Control**: Make it easy to define and/or combine agents and workflows.
+- **Persistence**: Provide a way to persist the state of a graph, which enables both memory and human-in-the-loop.
+- **Testing, Debugging, and Deployment**: Provide an easy onramp for testing, debugging, and deploying applications.
+
+##### Control
+
+LangGraph lets you define your application as a graph with:
+
+1. *State*: What information do we need to track over the course of the application?
+2. *Nodes*: How do we want to update this information over the course of the application?
+3. *Edges*: How do we want to connect these nodes together?
+
+We can use the [`StateGraph` class](https://langchain-ai.github.io/langgraph/concepts/low_level/#graphs) to initialize a LangGraph graph with a [`State` object](https://langchain-ai.github.io/langgraph/concepts/low_level/#state).
+
+`State` defines the schema for information we want to track over the course of the application.
+
+This can be any object with `getattr()` in python, such as a dictionary, dataclass, or Pydantic object:
+
+- TypeDict is fastest but doesn’t support defaults
+- Dataclass is basically as fast, supports dot syntax `state.foo`, and has defaults.
+- Pydantic is slower (especially with custom validators) but gives type validation.
+
+
+#### Tool decorator
+
+The `@tool` decorator is a powerful feature in LangChain that allows you to easily convert Python functions into callable tools that can be used by large language models (LLMs). By using this decorator, you can define the functionality of your tools in a straightforward manner, and LangChain will automatically infer the tool's name, description, and expected arguments from the function definition.
+
+By default, the function’s docstring becomes the tool’s description that helps the model understand when to use it.
+
+Type hints are required as they define the tool’s input schema. The docstring should be informative and concise to help the model understand the tool’s purpose.
+
+```python
+from langchain.tools import tool
+@tool
+def write_email(to: str, subject: str, content: str) -> str:
+    """Write and send an email."""
+    # Placeholder response - in real app would send email
+    return f"Email sent to {to} with subject '{subject}' and content: {content}"
+```
+
+With the `@tool` decorator our function is turned into a `StructuredTool` object
+
+
+### Agents
+
+Agents combine language models with tools to create systems that can reason about tasks, decide which tools to use, and iteratively work towards solutions.
+
+create_agent() provides a production-ready ReAct (Reasoning + Acting) agent implementation based on the paper ReAct: Synergizing Reasoning and Acting in Language Models.
+
+ReAct frames an agent’s behavior as an interleaving of thought -> action -> observation steps, where the model writes out its reasoning, picks a tool, sees the tool’s result, and then repeats. ReAct reduces hallucinations and makes the decision process auditable: the agent can form hypotheses (thought), test them with tools (action), and update its plan based on feedback (observation).
+
+A ReAct loop runs until a stop condition - i.e., when the model emits a final answer or a max-iterations limit is reached.
+
+![agent](image-27.png)
 
