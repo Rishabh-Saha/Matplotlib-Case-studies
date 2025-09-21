@@ -670,10 +670,65 @@ LlamaIndex is a data framework designed to facilitate the integration of externa
 
 They provide set of tools:
 1. **Data Connectors**: LlamaIndex offers connectors to various data sources, including databases, file systems, and web APIs. This allows users to easily ingest data from multiple sources into the framework.
+
+Data connectors can handle data from a wide range of sources, including the following:
+
+   - PDFs: Portable document format files commonly used for documents, reports and publications.
+   - YouTube videos: Data from videos hosted on the YouTube platform
+   - Audio files: Data from audio recordings or music files
+   - Web pages: Content extracted from websites on the internet
+   - Wikipedia pages: Information sourced from Wikipedia, an extensive online encyclopaedia
+   - SQL databases: Data retrieved from structured databases using SQL queries
+   - Docx files: Documents created in the Microsoft Word format (docx)
+
 2. **Indexing**: The framework includes indexing capabilities that enable efficient storage and retrieval of data. This is particularly important for handling large datasets and ensuring fast query responses.
-3. **Query Interface**: LlamaIndex provides a query interface that allows users to interact with the indexed data using natural language queries. This interface is designed to work seamlessly with LLMs, enabling users to extract insights and information from their data.
-4. **Integration with LLMs**: LlamaIndex is built to work with various LLMs, allowing users to leverage the strengths of different models for their applications. This includes support for popular models like GPT-3, GPT-4, and others
+3. **Retrievers**: LlamaIndex includes retriever modules that help in fetching relevant information from the indexed data based on user queries. These retrievers can be customized to suit specific use cases and data types.
+4. **Response Synthesizers**: Once the retriever has completed its job and fetched relevant nodes, the response synthesizer takes over. The response synthesizer processes the user's query and the retrieved nodes to generate an appropriate answer. There are various modes of operation for the synthesizer, including "refine," "accumulate," "compact," "accumulate and compact," "summarize" and "simple summarize." These modes determine how the synthesizer interacts with the data nodes to produce responses.
+5. **Query Engines**: LlamaIndex provides query engines that facilitate interaction with the indexed data using natural language queries. This allows users to ask questions and receive answers based on the underlying data.
+
+
 
 Overall, LlamaIndex aims to simplify the process of building LLM-powered applications by providing a comprehensive framework for data management and interaction.
 
 ![LlamaIndex](image-28.png)
+
+```python
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+
+documents = SimpleDirectoryReader('data').load_data()
+index = VectorStoreIndex.from_documents(documents)
+query_engine = index.as_query_engine()
+response = query_engine.query("What did the author do growing up?")
+print(response)
+```
+
+### Indices
+
+LlamaIndex provides several types of indices to organize and retrieve data efficiently. Here are some of the key index types:
+
+1. **Vector Store Index**: 
+
+- The Vector Store Index is a component of the LamaIndex and is used to efficiently store and retrieve information from large collections of text documents. It does not work like traditional SQL database indexes; instead, it divides documents into smaller chunks and computes an embedding for each chunk to facilitate quick retrieval.
+- Documents are divided into smaller portions called nodes. Each node corresponds to a chunk of text from the document.
+- For each node, an embedding is computed. Embeddings are numerical representations of the text content, allowing for similarity comparisons.
+- The LamaIndex converts document objects into node objects and stores each node and its corresponding embedding in a vector store.
+- When you want to find information in your documents, you query the Vector Store Index. It involves fetching the top K similar nodes based on embedding similarity.
+- Once the similar nodes are retrieved, they are passed to the Response Synthesis Module. This module takes these nodes and generates responses to your queries, often using AI models such as GPT-4.
+- This type of index is useful when you want to retrieve text data efficiently and generate responses for questions or queries.
+
+2. **List Index**:
+
+- The List Index is another part of the LamaIndex system that organises and retrieves text data. It is particularly useful for summarising.
+- Data is segmented into distinct sets of nodes and linked together in a sequence. This sequence can be thought of as an ordered list of nodes.
+- During querying, you can retrieve nodes directly or based on embedding similarity using the similar_to parameter. This parameter allows you to retrieve nodes that are the most similar to a reference node.
+- The List Index can be effectively used for summarisation. It goes through all the available nodes to generate a summary of the given document.
+- The service context parameter response_mode can be set to "tree_summarize" to facilitate summarisation.
+- This index is ideal when you need to generate summaries or structured responses from your text documents.
+
+3. **Keyword Table Index**:
+
+- The Keyword Table Index focuses on extracting and managing keywords within text documents to facilitate efficient retrieval of relevant information.
+- It extracts keywords from each node in a document and creates a mapping from these keywords to the nodes that contain them.
+- When a query includes specific keywords, this index filters nodes that contain those keywords. These filtered nodes are then used to generate responses.
+- This index is particularly efficient for quickly retrieving nodes that contain specific keywords. It helps connect queries with relevant content in the document.
+- It is valuable when you want to quickly locate information related to specific keywords or topics within your text documents.
