@@ -732,3 +732,61 @@ LlamaIndex provides several types of indices to organize and retrieve data effic
 - When a query includes specific keywords, this index filters nodes that contain those keywords. These filtered nodes are then used to generate responses.
 - This index is particularly efficient for quickly retrieving nodes that contain specific keywords. It helps connect queries with relevant content in the document.
 - It is valuable when you want to quickly locate information related to specific keywords or topics within your text documents.
+
+## Fine Tuning LLMs
+
+LLMs are trained through a 2 stage process:
+1. **Pre-training**: 
+In this stage, the model is trained on a large corpus of text data to learn general language patterns and representations. This involves predicting the next word in a sentence or filling in missing words, allowing the model to understand grammar, syntax, and semantics.
+
+The task for which the LLM is being pretrained is called "next token prediction." This means that the model is presented with a string of tokens and must predict the subsequent token in the sequence. 
+
+The training method is self-supervised. Self-supervised learning leverages the text itself to provide the supervision. Since the correct next token is part of the input data, the model uses the input to teach itself without the need for external labels. This process is performed on a massive data set
+
+
+2. **Fine-tuning**: After pre-training, the model is further trained on a smaller, task-specific dataset. This stage helps the model adapt to specific tasks, such as text classification, question answering, or sentiment analysis. Fine-tuning typically involves supervised learning, where the model is provided with labeled examples to learn from.
+
+The goals of fine-tuning are two-fold. Firstly, it may aim to increase the model's knowledge about a specialised topic, making it more informed and better able to understand queries about that topic. Secondly, it can alter the model's behaviour to make it more suitable for specific applications, such as training it to follow instructions or maintain a conversation.
+
+### Prompt engineering vs. fine-tuning
+
+We have looked at two reasons to fine-tune a foundation model:
+- To change its behaviour
+- To increase specialised knowledge
+
+But arguably, we can achieve these results by simply prompting a large language model properly. That is true and in many cases prompt engineering provides adequate performance on required tasks. In such cases, we may not need to perform fine-tuning. Therefore it is always recommended that you start approaching a problem by performing prompt engineering. You may end up solving the problem without having to fine-tune the model and even if you end up having to fine-tune the model, writing prompts to approach a problem will give you a better understanding of the problem and the data required to fine-tune the language model.
+
+- By fine-tuning, models can provide more consistent responses, aligning more closely with the expected outcomes of their tasks.
+- Another advantage of fine-tuning is the reduction in hallucinations, which are instances where a model generates incorrect or nonsensical information. Fine-tuning helps to ground the model's responses in reality, making them more accurate and reliable.
+
+Remarkably, fine-tuning can enable smaller models to outperform larger ones on specialised tasks. A smaller model with fewer parameters, when fine-tuned, can become highly efficient at a specific job, sometimes even surpassing a larger model that hasn't been fine-tuned. This specialisation not only leads to better performance but can also result in lower computational costs. For instance, a model with 410 million parameters that has been fine-tuned for a particular domain may perform better in that domain than a much larger model with 175 billion parameters that hasn't undergone the same process.
+
+### How to fine-tune an LLM
+
+There are 3 approaches to fine-tuning an LLM:
+- Self-supervised fine-tuning
+- Supervised fine-tuning
+- Reinforcement learning with human feedback (RLHF)
+
+## Diffusion Models
+
+Diffusion models are advanced deep learning models that excel at generating high-quality data, particularly images, by learning to reverse a process of gradually adding random noise to data.
+
+**Discriminative vs Generative models**
+---
+
+Discriminative models are designed to classify input data into predefined categories. Cats vs Dogs.
+Generative models, on the other hand, are designed to generate new data samples that resemble the training data
+
+| Discriminative Model |	Generative Model |
+|----------------------|------------------|
+| Classify data points into categories | Generates new data points from the same distribution as the training data |
+| Produces a decision boundary, distinguishing between different classes | Produces new samples that resemble the training data, often creating entirely new instances |
+| Focuses on the boundary between classes | Focuses on modelling the entire data distribution |
+| Commonly used in classification tasks, such as spam detection, sentiment analysis | Used in image, text, or sound generation, data augmentation, unsupervised learning tasks |
+
+Image generation can be of 2 types:
+- Unconditional generation: The model generates images without any specific input or condition. It creates images based solely on the patterns it has learned from the training data.
+- Conditional generation: The model generates images based on specific input conditions or prompts.
+
+![Stable Diffusion](Stablediffusion.png)
