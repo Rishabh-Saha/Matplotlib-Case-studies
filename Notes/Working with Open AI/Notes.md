@@ -191,6 +191,26 @@ After the discussion, you end up with a detailed understanding that combines eve
 - Let number of heads be denoted as h, Now let d₃ = d₂/h
 - Each attention head will have its own set of learned parameters, allowing the model to jointly attend to information from different representation subspaces at different positions.
 
+#### Transformer Architecture
+
+![Transformer Architecture](transformer_arch.png)
+
+Best explaination on the internet: [Transformer](https://www.youtube.com/watch?v=4Bdc55j80l8)
+
+Encoder
+- The encoder takes an input sequence and maps it into an abstract, continuous representation. 
+- It processes input words by first converting them into word embeddings and adding positional encodings. 
+- The encoder then uses multi-headed self-attention to allow each word to "attend" to other words in the input, followed by a point-wise feed-forward network for further enrichment.
+- Residual connections and layer normalization are also used in between these layers to stabilise training and improve performance.
+
+Decoder
+- The decoder generates the output sequence step by step. 
+- It takes previous outputs and the encoder's output as input. The decoder also uses positional encodings and has two multi-headed attention layers:
+- The first is a "masked" multi-headed attention layer, which prevents the decoder from "looking ahead" at future words it hasn't generated yet.
+- The second multi-headed attention layer helps the decoder focus on relevant parts of the encoder's output.
+- This is also followed by a point-wise feed-forward network.
+- Finally, a linear layer and a softmax layer are used to predict the next word.
+
 ### Autoregressive training
 
 NLP tasks can be considered an application of next-token prediction. In a transformer, this task of next token prediction will be performed on top of an attention mechanism. So, the prediction of the next token takes into account the entire input sequence and the tokens predicted so far.
